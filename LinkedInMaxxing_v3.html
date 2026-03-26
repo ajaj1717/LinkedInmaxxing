@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkedInMaxxing</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f3f2ef;
+      --surface: #ffffff;
+      --surface2: #f8f7f4;
+      --border: #e0ddd6;
+      --border-focus: #0a66c2;
+      --accent: #0a66c2;
+      --accent2: #0073b1;
+      --accent-light: #e8f0f9;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --text-dim: #888;
+      --gold: #e7a500;
+      --gold-light: #fff8e6;
+      --green: #057642;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 4px 24px rgba(0,0,0,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    /* API Key Banner */
+    .key-banner {
+      background: #fff8e6;
+      border-bottom: 1px solid #f0d080;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 13.5px;
+      color: #7a5500;
+      position: relative;
+      z-index: 99;
+    }
+    .key-banner.hidden { display: none; }
+    .key-banner label { font-weight: 600; white-space: nowrap; }
+    .key-input {
+      font-family: monospace;
+      font-size: 13px;
+      padding: 6px 12px;
+      border: 1px solid #e0c060;
+      border-radius: 8px;
+      background: #fff;
+      color: #333;
+      width: 340px;
+      outline: none;
+      direction: ltr;
+    }
+    .key-input:focus { border-color: var(--accent); }
+    .key-save-btn {
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 7px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .key-save-btn:hover { background: var(--accent2); }
+    .key-status { font-size: 12px; color: var(--green); font-weight: 600; }
+    .key-edit { font-size: 12px; color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+    /* Subtle grid bg */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(10,102,194,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(10,102,194,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 58px;
+      box-shadow: var(--shadow);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: white;
+      font-weight: 800;
+      font-family: 'Tajawal', sans-serif;
+      letter-spacing: -1px;
+    }
+    .logo-name { font-size: 17px; font-weight: 700; color: var(--accent); }
+    .logo-tagline { font-size: 11px; color: var(--text-muted); font-weight: 300; }
+
+    nav { display: flex; gap: 6px; align-items: center; }
+    nav a {
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13.5px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      transition: all 0.18s;
+    }
+    nav a:hover { color: var(--text); background: var(--surface2); }
+    .btn-cta {
+      background: var(--accent);
+      color: #fff !important;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(10,102,194,0.3);
+    }
+    .btn-cta:hover { background: var(--accent2); opacity: 1 !important; }
+
+    /* MAIN */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 36px 20px 60px;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      margin-bottom: 32px;
+      animation: fadeDown 0.5s ease;
+    }
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:none; } }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gold-light);
+      border: 1px solid #f0d080;
+      color: #8a6000;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-family: 'Tajawal', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p { font-size: 15px; color: var(--text-muted); font-weight: 300; }
+
+    /* MODE TABS */
+    .mode-tabs {
+      display: flex;
+      gap: 2px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 5px;
+      width: fit-content;
+      margin: 0 auto 24px;
+      box-shadow: var(--shadow);
+    }
+    .tab {
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 9px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.18s;
+      border: none;
+      background: none;
+    }
+    .tab:hover { color: var(--text); background: var(--surface2); }
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(10,102,194,0.25);
+    }
+
+    /* CARD */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: fadeUp 0.4s ease 0.1s both;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+    /* Style bar */
+    .style-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 20px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .style-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .style-label {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .style-opts { display: flex; gap: 4px; }
+    .style-opt {
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      font-size: 12.5px;
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .style-opt:hover { border-color: var(--accent); color: var(--accent); }
+    .style-opt.active {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .emoji-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+    }
+    .toggle input { display: none; }
+    .toggle-track {
+      width: 100%;
+      height: 100%;
+      background: #ccc;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle input:checked + .toggle-track { background: var(--accent); }
+    .toggle-thumb {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 14px;
+      height: 14px;
+      background: white;
+      border-radius: 50%;
+      transition: right 0.2s;
+      pointer-events: none;
+    }
+    .toggle input:checked ~ .toggle-thumb { right: calc(100% - 17px); }
+
+    /* PANES */
+    .panes {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      min-height: 280px;
+    }
+    .pane-divider { background: var(--border); }
+    .pane { display: flex; flex-direction: column; position: relative; }
+
+    .pane-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 0;
+    }
+    .pane-lang {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pane-lang .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    textarea {
+      font-family: 'Tajawal', sans-serif;
+      width: 100%;
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.75;
+      padding: 14px 18px 12px;
+      resize: none;
+      min-height: 220px;
+      direction: rtl;
+      font-weight: 400;
+    }
+    textarea::placeholder { color: #bbb; }
+    #targetText { color: var(--text); font-weight: 400; }
+
+    .pane-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px 14px;
+      border-top: 1px solid var(--border);
+    }
+    .char-count { font-size: 12px; color: var(--text-muted); }
+    .pane-actions { display: flex; align-items: center; gap: 6px; }
+
+    .icon-btn {
+      background: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--text-muted);
+      padding: 6px 8px;
+      border-radius: 7px;
+      transition: all 0.15s;
+    }
+    .icon-btn:hover { color: var(--accent); border-color: var(--border); background: var(--accent-light); }
+
+    .translate-btn {
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 9px 22px;
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 10px rgba(10,102,194,0.3);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .translate-btn:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(10,102,194,0.4); }
+    .translate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Hashtags */
+    .hashtags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 12px 18px;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      min-height: 46px;
+    }
+    .hashtag {
+      font-size: 12.5px;
+      color: var(--accent);
+      background: var(--accent-light);
+      border: 1px solid #c5d9f0;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      animation: popIn 0.2s ease both;
+    }
+    @keyframes popIn { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      display: inline-block;
+    }
+
+    /* Result fade */
+    @keyframes resultFade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+    .result-anim { animation: resultFade 0.35s ease; }
+
+    /* EXAMPLES */
+    .examples-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin: 28px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .examples-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .examples {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .example-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .example-card:hover { border-color: var(--accent); box-shadow: 0 2px 10px rgba(10,102,194,0.1); transform: translateY(-1px); }
+    .example-before { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-style: italic; }
+    .example-arrow { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+    .example-after { font-size: 12.5px; color: var(--accent); font-weight: 500; line-height: 1.5; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      opacity: 0;
+      transition: all 0.25s;
+      z-index: 999;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 700px) {
+      .panes { grid-template-columns: 1fr; }
+      .pane-divider { height: 1px; width: 100%; }
+      .examples { grid-template-columns: 1fr; }
+      header { padding: 0 14px; }
+      .hero h1 { font-size: 24px; }
+      .mode-tabs { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">in</div>
+    <div>
+      <div class="logo-name">LinkedInMaxxing</div>
+      <div class="logo-tagline">حوّل كلامك إلى محترف</div>
+    </div>
+  </a>
+  <nav>
+    <a href="#">كيف يعمل؟</a>
+    <a href="#" class="btn-cta">جرّبه مجاناً 🚀</a>
+  </nav>
+</header>
+
+<!-- API KEY BANNER -->
+<div class="key-banner hidden" id="keyBanner">
+  <label>🔑 أدخل API Key الخاص بك:</label>
+  <input class="key-input" id="keyInput" type="password" placeholder="sk-ant-api03-..." />
+  <button class="key-save-btn" onclick="saveKey()">حفظ وتفعيل ✓</button>
+  <span style="font-size:12px; color:#a07020">
+    احصل على الـ Key من <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>
+  </span>
+</div>
+<div class="key-banner hidden" id="keyDoneBanner">
+  <span class="key-status">✅ الـ Key محفوظ — الموقع جاهز للاستخدام!</span>
+  <span class="key-edit" onclick="editKey()">تغيير الـ Key</span>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">✨ مدعوم بالذكاء الاصطناعي</div>
+    <h1>كلامك العادي → <span>بوست لينكدان</span> 🔥</h1>
+    <p>اكتب اللي تبي تقوله بكلامك العادي، وخلّنا نحوّله لمحتوى لينكدان احترافي ومؤثر</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="mode-tabs">
+    <button class="tab active">✍️ نص عادي</button>
+    <button class="tab">💼 إنجاز</button>
+    <button class="tab">💡 فكرة</button>
+    <button class="tab">🙏 شكر</button>
+    <button class="tab">📢 إعلان</button>
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+
+    <!-- Style bar -->
+    <div class="style-bar">
+      <div class="style-group">
+        <span class="style-label">نبرة الكتابة:</span>
+        <div class="style-opts">
+          <button class="style-opt" data-style="motivational">🔥 تحفيزي</button>
+          <button class="style-opt active" data-style="professional">💼 احترافي</button>
+          <button class="style-opt" data-style="storytelling">📖 قصصي</button>
+          <button class="style-opt" data-style="humble">🙏 متواضع</button>
+        </div>
+      </div>
+      <div class="style-group">
+        <span class="style-label">هاشتاقات:</span>
+        <label class="toggle">
+          <input type="checkbox" id="hashtagToggle" checked />
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+        <span class="style-label">إيموجي:</span>
+        <label class="toggle">
+          <input type="checkbox" id="emojiToggle" checked />
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Panes -->
+    <div class="panes">
+      <!-- Source -->
+      <div class="pane">
+        <div class="pane-header">
+          <div class="pane-lang">كلامك العادي</div>
+        </div>
+        <textarea id="sourceText" placeholder="مثال: اليوم خلصت مشروع كان صعب وتعبت منه كثير، الحمدلله انتهى..." maxlength="5000" oninput="updateCount()"></textarea>
+        <div class="pane-footer">
+          <span class="char-count" id="charCount">0 / 5,000</span>
+          <div class="pane-actions">
+            <button class="icon-btn" title="مسح" onclick="clearAll()">🗑️</button>
+            <button class="translate-btn" id="mainBtn" onclick="doTransform()">
+              <span id="btnLabel">حوّل للينكدان</span>
+              <span id="btnIcon">⚡</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pane-divider"></div>
+
+      <!-- Target -->
+      <div class="pane">
+        <div class="pane-header">
+          <div class="pane-lang"><span class="dot"></span> نسخة لينكدان</div>
+        </div>
+        <textarea id="targetText" placeholder="سيظهر البوست الاحترافي هنا... ✨" readonly></textarea>
+        <div class="pane-footer">
+          <span class="char-count" id="targetCount"></span>
+          <div class="pane-actions">
+            <button class="icon-btn" title="نسخ" onclick="copyResult()">📋 نسخ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hashtags row -->
+    <div class="hashtags" id="hashtagsRow"></div>
+
+  </div>
+
+  <!-- EXAMPLES -->
+  <div class="examples-label">أمثلة — اضغط لتجربة</div>
+  <div class="examples">
+    <div class="example-card" onclick="loadExample(0)">
+      <div class="example-before">"خلصت مشروع صعب اليوم"</div>
+      <div class="example-arrow">↓ لينكدان</div>
+      <div class="example-after">🚀 إنجاز استراتيجي يعكس الالتزام بالتميز...</div>
+    </div>
+    <div class="example-card" onclick="loadExample(1)">
+      <div class="example-before">"انضممت لشركة جديدة"</div>
+      <div class="example-arrow">↓ لينكدان</div>
+      <div class="example-after">💼 يسعدني الإعلان عن بداية رحلة مهنية جديدة...</div>
+    </div>
+    <div class="example-card" onclick="loadExample(2)">
+      <div class="example-before">"شكراً لكل اللي ساعدوني"</div>
+      <div class="example-arrow">↓ لينكدان</div>
+      <div class="example-after">🙏 النجاح لا يُبنى منفرداً، بل بأيادٍ كريمة...</div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// --- API Key Management ---
+let apiKey = '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';
+
+function initKey() {}
+function saveKey() {}
+function editKey() {}
+initKey();
+document.getElementById('keyInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveKey(); });
+
+const examples = [
+  "خلصت مشروع كان صعب جداً اليوم، تعبت منه كثير لكن الحمدلله انتهى وطلع كويس",
+  "انضممت لشركة جديدة هذا الأسبوع، أنا مبسوط بس خايف شوي",
+  "أبي أشكر كل اللي ساعدوني في مشواري، ناس كثير وقفوا معي"
+];
+
+let currentStyle = 'professional';
+
+document.querySelectorAll('.style-opt').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.style-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentStyle = btn.dataset.style;
+  });
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+
+function loadExample(i) {
+  document.getElementById('sourceText').value = examples[i];
+  updateCount();
+  doTransform();
+}
+
+function updateCount() {
+  const len = document.getElementById('sourceText').value.length;
+  document.getElementById('charCount').textContent = len.toLocaleString('ar') + ' / 5,000';
+}
+
+function clearAll() {
+  document.getElementById('sourceText').value = '';
+  document.getElementById('targetText').value = '';
+  document.getElementById('targetCount').textContent = '';
+  document.getElementById('hashtagsRow').innerHTML = '';
+  updateCount();
+}
+
+function copyResult() {
+  const text = document.getElementById('targetText').value;
+  const hashtags = [...document.querySelectorAll('.hashtag')].map(h => h.textContent).join(' ');
+  if (!text) return;
+  navigator.clipboard.writeText(text + (hashtags ? '\n\n' + hashtags : ''));
+  showToast('تم نسخ البوست ✓');
+}
+
+const styleInstructions = {
+  motivational: 'تحفيزي وملهم بقوة، يحث الناس على الفعل ويعطي طاقة إيجابية عالية',
+  professional: 'احترافي ورسمي، يُبرز الكفاءة والخبرة ويناسب بيئة الأعمال',
+  storytelling: 'قصصي يروي تجربة بأسلوب شيق يشد القارئ من البداية للنهاية',
+  humble: 'متواضع وممتن، يُظهر الشكر والتقدير مع إبراز الإنجاز بتواضع'
+};
+
+async function doTransform() {
+  const text = document.getElementById('sourceText').value.trim();
+  if (!text) { showToast('اكتب شيء أولاً!'); return; }
+
+  const useEmoji = document.getElementById('emojiToggle').checked;
+  const useHashtags = document.getElementById('hashtagToggle').checked;
+  const styleDesc = styleInstructions[currentStyle];
+
+  const btn = document.getElementById('mainBtn');
+  const label = document.getElementById('btnLabel');
+  const icon = document.getElementById('btnIcon');
+  btn.disabled = true;
+  label.textContent = 'جارٍ التحويل';
+  icon.innerHTML = '<span class="spinner"></span>';
+  document.getElementById('hashtagsRow').innerHTML = '';
+
+  const prompt = `أنت خبير في كتابة محتوى لينكدان بالعربية. مهمتك تحويل الكلام العادي إلى بوست لينكدان احترافي ومؤثر.
+
+النبرة المطلوبة: ${styleDesc}
+${useEmoji ? 'استخدم إيموجي مناسبة في بداية السطور لإضفاء حيوية.' : 'لا تستخدم أي إيموجي.'}
+
+القواعد:
+- حافظ على المعنى الأصلي لكن أضف "البهرجة" والأسلوب الاحترافي المعروف في لينكدان
+- قسّم النص لفقرات قصيرة مع مسافات بينها
+- أضف hook قوي في الجملة الأولى يشد الانتباه
+- اجعله يبدو وكأنه كُتب بإتقان من شخص ناجح
+- الطول: 100-200 كلمة
+${useHashtags ? `
+بعد البوست، في سطر منفصل اكتب بالضبط:
+HASHTAGS: ثم اكتب 5-7 هاشتاق عربية وإنجليزية مناسبة مفصولة بمسافة` : ''}
+
+الكلام الأصلي:
+"${text}"
+
+اكتب البوست فقط بدون أي مقدمة أو شرح.`;
+
+  if (!apiKey) { showToast('أدخل الـ API Key أولاً ⬆️'); btn.disabled=false; label.textContent='حوّل للينكدان'; icon.textContent='⚡'; return; }
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    let full = data.content?.map(b => b.text || '').join('') || '';
+
+    // Extract hashtags
+    let postText = full;
+    let hashtags = [];
+    const hashMatch = full.match(/HASHTAGS:\s*(.+)/);
+    if (hashMatch) {
+      postText = full.replace(/HASHTAGS:.*/, '').trim();
+      hashtags = hashMatch[1].trim().split(/\s+/).filter(h => h.startsWith('#'));
+    }
+
+    const tgt = document.getElementById('targetText');
+    tgt.value = postText;
+    tgt.classList.add('result-anim');
+    setTimeout(() => tgt.classList.remove('result-anim'), 500);
+    document.getElementById('targetCount').textContent = postText.length.toLocaleString('ar') + ' حرف';
+
+    if (useHashtags && hashtags.length) {
+      const row = document.getElementById('hashtagsRow');
+      hashtags.forEach((h, i) => {
+        const el = document.createElement('span');
+        el.className = 'hashtag';
+        el.textContent = h;
+        el.style.animationDelay = `${i * 0.06}s`;
+        row.appendChild(el);
+      });
+    }
+  } catch(e) {
+    showToast('حدث خطأ، حاول مرة ثانية');
+  } finally {
+    btn.disabled = false;
+    label.textContent = 'حوّل للينكدان';
+    icon.textContent = '⚡';
+  }
+}
+
+document.getElementById('sourceText').addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') doTransform();
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
